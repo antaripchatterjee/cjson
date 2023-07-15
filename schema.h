@@ -1,17 +1,7 @@
-#if !defined(__MAIN_H__)
-#define __MAIN_H__
+#if !defined(__SCHEMA_H__)
+#define __SCHEMA_H__
 
 #include "cjson.h"
-
-#define JSONData "{\n\t" \
-    "\"firstname\" : \"Robin\",\n\t" \
-    "\"lastname\" : \"Roy\",\n\t" \
-    "\"age\" : 30,\n\t" \
-    "\"address\" : {\n\t\t" \
-    "\"address_text\" : \"Gujrat\",\n\t\t" \
-    "\"postal_code\" : 396215\n\t" \
-    "}\n"\
-"}" \
 
 typedef struct {
     cjson_property(char[128]) address_text;
@@ -23,9 +13,18 @@ typedef struct {
     cjson_property(char[128]) firstname;
     cjson_property(char[128]) lastname;
     cjson_property(unsigned short) age;
-    // cjson_property(struct Address) address;
+    cjson_property(Address) address;
     cjson_property(size_t) noproperty;
 } Person;
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+Address newAddress();
+Person newPerson();
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #define CJSONSchema__Address(_O) { \
     CJSONSchemaDef(_O, address_text), \
@@ -37,7 +36,8 @@ typedef struct {
     CJSONSchemaDef(_O, firstname), \
     CJSONSchemaDef(_O, lastname), \
     CJSONSchemaDef(_O, age), \
+    CJSONSchemaDef(_O, address, newAddress()), \
     CJSONSchemaDefEnd(noproperty) \
 }
 
-#endif // __MAIN_H__
+#endif // __SCHEMA_H__
