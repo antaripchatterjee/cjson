@@ -4,10 +4,10 @@
         "name": "Win32-GCC",
         "includePath": [
           "${workspaceFolder}/**",
-          "C:\\msys64\\ucrt64\\include" // Adjust to your MinGW path
+          "C:\\msys64\\ucrt64\\include"
         ],
         "defines": [],
-        "compilerPath": "C:\\msys64\\ucrt64\\bin\\gcc.exe", // Point to your gcc.exe
+        "compilerPath": "C:\\msys64\\ucrt64\\bin\\gcc.exe",
         "cStandard": "c11",
         "cppStandard": "c++17",
         "intelliSenseMode": "windows-gcc-x64"
