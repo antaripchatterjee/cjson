@@ -34,7 +34,7 @@ typedef struct { const char* key; const char* schema; } cjson_footer_t;
 typedef struct { const char* key; const size_t size; } cjson_property_base_t;
 
 #define cjson_property_t(T) struct { const char* key; const size_t size; __typeof__(T) data; }
-
+/*
 #define CJSONNew(_T) ({ \
     _T* _self = (_T*) malloc(sizeof(_T)); \
     if(_self) { \
@@ -51,12 +51,15 @@ typedef struct { const char* key; const size_t size; } cjson_property_base_t;
     } \
     _self; \
 })
+*/
+
+#define CJSONNew(_T) ((_T*) cjson_new(sizeof(_T), #_T, &(CJSONSchema(_T))))
 
 #ifdef __cplusplus // __cplusplus
 extern "C" {
 #endif
 void* cjson_load_field_pointer_map(cjson_header_t* header, cjson_property_base_t* first_field_ptr, const char* schema);
-
+void* cjson_new(size_t type_size, const char *type_name, void *temp_struct);
 #ifdef __cplusplus // __cplusplus
 }
 #endif

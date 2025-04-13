@@ -31,3 +31,18 @@ void* cjson_load_field_pointer_map(cjson_header_t* header, cjson_property_base_t
     }
     return header->pointers;
 }
+
+
+void* cjson_new(size_t type_size, const char *type_name, void *temp_struct) {
+    void *_self = malloc(type_size);
+    if (_self) {
+        _self = memmove(_self, temp_struct, type_size);
+        if (!cjson_load_field_pointer_map(
+                (cjson_header_t*) _self,
+                (cjson_property_base_t*) (((char*) _self) + sizeof(cjson_header_t)), type_name)) {
+            free(_self);
+            _self = NULL;
+        }
+    }
+    return _self;
+}
