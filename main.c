@@ -5,7 +5,12 @@
 
 
 int main() {
-    Person person = newPerson();
-    
+    Person *person = newPerson();
+    if(person) {
+        free(person->address.data->_header.pointers);
+        free(person->address.data);
+        free(person->_header.pointers);
+        free(person);
+    }
     return 0;
 }

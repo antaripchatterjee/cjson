@@ -1,28 +1,33 @@
 #include "cjson-parser.h"
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 
-void cjson_read_key_set_from_schema(void* _schema, cjson_key_set* _set) {
-    cjson_property_base* key_ptr = (cjson_property_base*) _schema;
-    char* key;
-    while((key = (char*) key_ptr->key)) {
-        const size_t index = _set->count++;
-        _set->keys = (cjson_key_to_data_ptr_map*)(
-            _set->keys == NULL ?
-            malloc(sizeof(cjson_key_to_data_ptr_map)) :
-            realloc(_set->keys, _set->count * sizeof(cjson_key_to_data_ptr_map))
-        );
-        _set->keys[index].name = key;
-        _set->keys[index].data_ptr = ((void*) key_ptr + sizeof(cjson_property_base));
-        key_ptr = (cjson_property_base*) ((void*) key_ptr + sizeof(cjson_property_base) + key_ptr->size);
-    }
-}
 
-void cjson_free_key_set(cjson_key_set* _set) {
-    if(_set) {
-        if(_set->keys) {
-            free(_set->keys);
+void* cjson_load_field_pointer_map(cjson_header_t* header, cjson_property_base_t* first_field_ptr, const char* schema) {
+    cjson_property_base_t* field_ptr = first_field_ptr;
+    header->schema = schema;
+    char stop_loop = '\0';
+    while(field_ptr->key && !stop_loop) {
+        void* _data_ptr = (char*) field_ptr + sizeof(cjson_property_base_t) ;
+        if(header->pointers) {
+            header->pointers = (struct cjson_field_pointer_pair_t*) realloc(
+                header->pointers,
+                sizeof(struct cjson_field_pointer_pair_t) * (header->count + 1)
+            );
+        } else {
+            header->pointers = (struct cjson_field_pointer_pair_t*) malloc(
+                sizeof(struct cjson_field_pointer_pair_t)
+            );
         }
-        _set->count = 0L;
+        if(header->pointers) {
+            header->count++;
+            header->pointers[header->count-1].key = field_ptr->key;
+            header->pointers[header->count-1].address = _data_ptr;
+            field_ptr = (cjson_property_base_t*) ((char*) _data_ptr + DISTANCE(field_ptr->size));
+        } else {
+            header->schema = NULL;
+            header->count = 0ULL;
+            stop_loop = '\1';
+        }
     }
+    return header->pointers;
 }
